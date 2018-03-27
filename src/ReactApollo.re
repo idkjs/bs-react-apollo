@@ -103,7 +103,7 @@ module CreateQuery = (Config: Config) => {
 };
 
 module CreateMutation = (Config: Config) => {
-  let queryGql = gql(. Config.query);
+  let mutationGql = gql(. Config.query);
   type apolloOptions = {
     .
     "query": ApolloTypes.queryString,
@@ -179,7 +179,7 @@ module CreateMutation = (Config: Config) => {
       ~props=
         Js.Nullable.(
           {
-            "query": queryGql,
+            "mutation": mutationGql,
             "variables": variables |> Js.Null_undefined.fromOption,
             "onError": fromOption(onError),
             "onCompleted": fromOption(onCompleted),
