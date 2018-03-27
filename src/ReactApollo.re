@@ -126,8 +126,12 @@ module CreateMutation = (Config: Config) => {
     | Error(apolloError)
     | Data(Config.t)
     | NoData;
+  type rawData = option(Config.t);
   type apollo = {
     data,
+    rawData,
+    loading: bool,
+    error: option(ApolloTypes.apolloError),
     networkStatus: int,
   };
   let apolloDataToReason: apolloData => data =
@@ -158,6 +162,17 @@ module CreateMutation = (Config: Config) => {
   external reactClass : ReasonReact.reactClass = "Mutation";
   let convertJsInputToReason = (apolloData: apolloData) => {
     data: apolloDataToReason(apolloData),
+    rawData:
+      switch (Js.Null_undefined.toOption(apolloData##data)) {
+      | None => None
+      | Some(data) =>
+        switch (Config.parse(data)) {
+        | parsedData => Some(parsedData)
+        | exception _ => None
+        }
+      },
+    error: Js.Null_undefined.toOption(apolloData##error),
+    loading: Js.to_bool(apolloData##loading),
     networkStatus: apolloData##networkStatus,
   };
   type mutationOptions = {
