@@ -176,3 +176,14 @@ module ApolloConsumer = {
   let make = (children: generatedApolloClient => ReasonReact.reactElement) =>
     ReasonReact.wrapJsForReason(~reactClass, ~props=Js.Obj.empty(), children);
 };
+
+module ApolloProvider = {
+  [@bs.module "react-apollo"]
+  external reactClass : ReasonReact.reactClass = "ApolloProvider";
+  let make = (~client: generatedApolloClient, children) =>
+    ReasonReact.wrapJsForReason(
+      ~reactClass,
+      ~props={"client": client},
+      children,
+    );
+};
