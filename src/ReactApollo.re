@@ -52,8 +52,8 @@ module CreateQuery = (Config: Config) => {
         Js.Null_undefined.toOption(apolloData##error),
       ) {
       | (true, None, _) => Loading
-      /* | (true, Some(data), _) => LoadingWithData(Config.parse(data)) */
-      /* TODO Data is not some or none here it is {} or {stuff} */
+      | (true, Some(_), _) => Loading
+      /* TODO Above should be loading with data, however, data is not some or none here it is {} or {stuff} */
       | (false, Some(data), None) => Data(Config.parse(data))
       | (false, _, Some(error)) => Error(error)
       | (false, None, None) => NoData
