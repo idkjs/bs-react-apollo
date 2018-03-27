@@ -52,8 +52,11 @@ module CreateQuery = (Config: Config) => {
         Js.Null_undefined.toOption(apolloData##error),
       ) {
       | (true, None, _) => Loading
-      | (true, Some(_), _) => Loading
-      /* TODO Above should be loading with data, however, data is not some or none here it is {} or {stuff} */
+      | (true, Some(data), _) =>
+        switch (Config.parse(data)) {
+        | parsedData => LoadingWithData(parsedData)
+        | exception _ => Loading
+        }
       | (false, Some(data), None) => Data(Config.parse(data))
       | (false, _, Some(error)) => Error(error)
       | (false, None, None) => NoData
@@ -119,6 +122,7 @@ module CreateMutation = (Config: Config) => {
     | Loading
     | LoadingWithData(Config.t)
     | Called
+    | CalledWithData(Config.t)
     | Error(apolloError)
     | Data(Config.t)
     | NoData;
@@ -135,9 +139,17 @@ module CreateMutation = (Config: Config) => {
         Js.Null_undefined.toOption(apolloData##error),
       ) {
       | (true, false, None, _) => Called
-      | (true, _, Some(data), _) => Data(Config.parse(data))
+      | (true, _, Some(data), _) =>
+        switch (Config.parse(data)) {
+        | parsedData => CalledWithData(parsedData)
+        | exception _ => Called
+        }
       | (_, true, None, _) => Loading
-      | (false, true, Some(data), _) => LoadingWithData(Config.parse(data))
+      | (false, true, Some(data), _) =>
+        switch (Config.parse(data)) {
+        | parsedData => LoadingWithData(parsedData)
+        | exception _ => Loading
+        }
       | (false, false, Some(data), None) => Data(Config.parse(data))
       | (false, false, _, Some(error)) => Error(error)
       | (false, false, None, None) => NoData
