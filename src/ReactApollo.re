@@ -160,26 +160,33 @@ module CreateMutation = (Config: Config) => {
     data: apolloDataToReason(apolloData),
     networkStatus: apolloData##networkStatus,
   };
+  type mutationOptions = {
+    .
+    "variables": Js.Nullable.t(Js.Json.t),
+    "refetchQueries": Js.Nullable.t(array(string)),
+  };
+  type apolloMutation =
+    Js.Nullable.t(mutationOptions) => Js.Promise.t(apolloData);
   let make =
       (
-        ~mutation,
+        ~variables: option(Js.Json.t)=?,
         ~onError: option(unit => unit)=?,
         ~onCompleted: option(unit => unit)=?,
-        children: (apollo, apolloData) => ReasonReact.reactElement,
+        children: (apolloMutation, apollo) => ReasonReact.reactElement,
       ) =>
     ReasonReact.wrapJsForReason(
       ~reactClass,
       ~props=
         Js.Nullable.(
           {
-            "mutation": gql(. mutation##query),
-            "variables": mutation##variables,
+            "query": queryGql,
+            "variables": variables |> Js.Null_undefined.fromOption,
             "onError": fromOption(onError),
             "onCompleted": fromOption(onCompleted),
           }
         ),
-      apolloData =>
-      apolloData |> convertJsInputToReason |> children
+      (mutation, apolloData) =>
+      children(mutation, convertJsInputToReason(apolloData))
     );
 };
 
