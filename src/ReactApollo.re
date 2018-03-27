@@ -34,7 +34,6 @@ module CreateQuery = (Config: Config) => {
   };
   type data =
     | Loading
-    | LoadingWithData(Config.t)
     | Error(apolloError)
     | Data(Config.t)
     | NoData;
@@ -51,12 +50,7 @@ module CreateQuery = (Config: Config) => {
         Js.Null_undefined.toOption(apolloData##data),
         Js.Null_undefined.toOption(apolloData##error),
       ) {
-      | (true, None, _) => Loading
-      | (true, Some(data), _) =>
-        switch (Config.parse(data)) {
-        | parsedData => LoadingWithData(parsedData)
-        | exception _ => Loading
-        }
+      | (true, _, _) => Loading
       | (false, Some(data), None) => Data(Config.parse(data))
       | (false, _, Some(error)) => Error(error)
       | (false, None, None) => NoData

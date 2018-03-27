@@ -33,8 +33,7 @@ let make = _children => {
                  | Error(_) =>
                    "Something Went Wrong" |> ReasonReact.stringToElement
                  | Loading => "Loading" |> ReasonReact.stringToElement
-                 | Data(result)
-                 | LoadingWithData(result) =>
+                 | Data(result) =>
                    switch (result##allFilms) {
                    | None => "No Films" |> ReasonReact.stringToElement
                    | Some(films) =>
